@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hydroponics Monitor</title>
+    <style>
+        :root {
+            /* Cool Color Scheme Palette */
+            --bg-color: #0f172a;       /* Dark Navy */
+            --panel-bg: #1e293b;       /* Slate */
+            --text-primary: #f1f5f9;   /* Off-white */
+            --text-secondary: #94a3b8; /* Light Gray */
+            --accent-color: #2dd4bf;   /* Teal/Cyan */
+            --accent-hover: #14b8a6;   /* Darker Teal */
+            --danger-color: #ef4444;   /* Red */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0;
+            font-weight: 300;
+            letter-spacing: 2px;
+            color: var(--accent-color);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        @media (min-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+
+        /* Card Styling */
+        .card {
+            background-color: var(--panel-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
+        }
+
+        .card-header {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 10px;
+            color: var(--text-secondary);
+        }
+
+        /* Camera Feed Styling */
+        .camera-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .video-feed {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16/9;
+            background-color: #000;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            object-fit: cover;
+            border: 2px solid #334155;
+        }
+
+        /* Controls Styling */
+        .controls-wrapper {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .d-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            width: 120px;
+        }
+
+        .btn {
+            background-color: #334155;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-refresh {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            padding: 10px 20px;
+        }
+
+        .btn-refresh:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* Schedule Form Styling */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        input[type="time"] {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--bg-color);
+            border: 1px solid #475569;
+            color: var(--text-primary);
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        input[type="time"]:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background-color: rgba(45, 212, 191, 0.1);
+            color: var(--accent-color);
+            font-size: 0.8rem;
+            margin-top: 10px;
+        }
+
+        /* Grid positioning for D-Pad */
+        .btn-up { grid-column: 2; }
+        .btn-left { grid-column: 1; grid-row: 2; }
+        .btn-right { grid-column: 3; grid-row: 2; }
+        .btn-down { grid-column: 2; grid-row: 3; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>HYDROPONICS<span style="color:white">LAB</span></h1>
+    </header>
+
+    <div class="dashboard-grid">
+        
+        <div class="card">
+            <div class="card-header">Live Feed</div>
+            <div class="camera-container">
+                <img id="camera-stream" class="video-feed" src="https://via.placeholder.com/640x360/0f172a/2dd4bf?text=Connecting+to+Camera..." alt="Live Stream">
+                
+                <div class="controls-wrapper">
+                    <button class="btn btn-refresh" onclick="refreshStream()">
+                        &#x21bb; Refresh Feed
+                    </button>
+                    
+                    <div class="d-pad">
+                        <button class="btn btn-up" onclick="moveCamera('up')">&#x25B2;</button>
+                        <button class="btn btn-left" onclick="moveCamera('left')">&#x25C0;</button>
+                        <button class="btn btn-right" onclick="moveCamera('right')">&#x25B6;</button>
+                        <button class="btn btn-down" onclick="moveCamera('down')">&#x25BC;</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Light Schedule</div>
+            
+            <div id="current-status" class="status-badge">System: Checking...</div>
+            
+            <form id="schedule-form" style="margin-top: 20px;">
+                <div class="form-group">
+                    <label for="start-time">Lights On</label>
+                    <input type="time" id="start-time" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="end-time">Lights Off</label>
+                    <input type="time" id="end-time" required>
+                </div>
+
+                <button type="button" class="btn" style="width: 100%" onclick="updateSchedule()">
+                    Update Schedule
+                </button>
+            </form>
+        </div>
+
+    </div>
+
+    <script>
+        // CONFIGURATION: Change this URL to match your FastAPI server address
+        const API_BASE_URL = "http://localhost:8000"; 
+        
+        // 1. Refresh Image Logic
+        function refreshStream() {
+            const imgElement = document.getElementById('camera-stream');
+            // We append a timestamp to the URL to prevent the browser from caching the image
+            const timestamp = new Date().getTime();
+            // Assuming your FastAPI has an endpoint /video_feed
+            imgElement.src = `${API_BASE_URL}/video_feed?t=${timestamp}`;
+        }
+
+        // 2. Camera Movement Logic
+        async function moveCamera(direction) {
+            console.log(`Moving camera: ${direction}`);
+            try {
+                const response = await fetch(`${API_BASE_URL}/camera/move`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ direction: direction }),
+                });
+                
+                if (!response.ok) throw new Error('Failed to move camera');
+                console.log("Camera moved successfully");
+            } catch (error) {
+                console.error("Error moving camera:", error);
+                alert("Error connecting to camera controls.");
+            }
+        }
+
+        // 3. Light Schedule Logic
+        async function updateSchedule() {
+            const startTime = document.getElementById('start-time').value;
+            const endTime = document.getElementById('end-time').value;
+
+            if (!startTime || !endTime) {
+                alert("Please select both start and end times.");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/lights/schedule`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ start: startTime, end: endTime }),
+                });
+
+                if (response.ok) {
+                    document.getElementById('current-status').textContent = "System: Schedule Updated";
+                    document.getElementById('current-status').style.backgroundColor = "rgba(45, 212, 191, 0.2)";
+                } else {
+                    throw new Error('Update failed');
+                }
+            } catch (error) {
+                console.error("Error updating lights:", error);
+                alert("Failed to update schedule.");
+            }
+        }
+
+        // Initial Load
+        window.onload = function() {
+            // Simulate fetching current schedule
+            // In production, you would fetch from `${API_BASE_URL}/lights/schedule`
+            document.getElementById('start-time').value = "08:00";
+            document.getElementById('end-time').value = "20:00";
+            document.getElementById('current-status').textContent = "System: Active";
+            
+            // Initial load of image
+            refreshStream(); 
+        };
+    </script>
+</body>
+</html>
