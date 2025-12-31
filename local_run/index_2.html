@@ -222,7 +222,7 @@
     </div>
 
     <script>
-        const API_BASE_URL = "http://192.168.0.14:8000"; 
+        const API_BASE_URL = "http://127.0.0.1:8000"//"http://192.168.0.14:8000"; 
         let authToken = null; // Store session token here
 
         // --- AUTHENTICATION LOGIC ---
@@ -234,11 +234,11 @@
             if(!userIn || !passIn) { alert("Please enter credentials"); return; }
 
             try {
-                const response = await fetch(`${API_BASE_URL}/login?username=${userIn}&password=${passIn}`)//, {
-                //    method: 'GET',
-                //    headers: { 'Content-Type': 'application/json' },
-                //    body: JSON.stringify({ username: userIn, password: passIn })
-                //});
+                const response = await fetch(`${API_BASE_URL}/login?username=${userIn}&password=${passIn}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: userIn, password: passIn })
+                });
 
                 const data = await response.json();
                 // /*

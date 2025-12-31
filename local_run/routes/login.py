@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from tinydb import TinyDB, Query
 import time
 
-print("importing login route")
+
  
 router = APIRouter()
 
@@ -20,13 +20,11 @@ def set_login_cookie(username, password, response:Response):
     return "ok"
     pass
 
-@router.get("/get-creds", tags=["login"])
+#@router.get("/get-creds", tags=["login"])
 def get_credentials(request: Request):
     
     return request.cookies.get("creds")
-
-
-@router.get("/verify-creds", tags=["login"])
+        
 def verify_credentials(request:Request):
     
     Tcreds = ("admin", "jamesp123")
