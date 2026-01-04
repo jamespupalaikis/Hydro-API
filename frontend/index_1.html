@@ -236,16 +236,26 @@
     </div>
 
     <script>
-        // CONFIGURATION: Change this URL to match your FastAPI server address
-        const API_BASE_URL = "http://localhost:8000"; 
+        // CONFIGURATION: Change this URL to match FastAPI server address
+        const API_BASE_URL = "http://192.168.0.14:8000"; 
         
         // 1. Refresh Image Logic
-        function refreshStream() {
+        async function refreshStream() {
             const imgElement = document.getElementById('camera-stream');
             // We append a timestamp to the URL to prevent the browser from caching the image
-            const timestamp = new Date().getTime();
+            //const timestamp = new Date().getTime();
             // Assuming your FastAPI has an endpoint /video_feed
-            imgElement.src = `${API_BASE_URL}/video_feed?t=${timestamp}`;
+            //imgElement.src = `${API_BASE_URL}/video_feed?t=${timestamp}`;
+
+            const img =  await fetch(`${API_BASE_URL}/api/take_pic`); //, {
+                    //method: 'GET',
+                    //headers: { 'Content-Type': 'application/json' },
+                    //body: JSON.stringify({ username: userIn, password: passIn })
+                //});
+            const blob = await img.blob();
+            const objectURL = URL.createObjectURL(blob);
+            imgElement.src = objectURL
+
         }
 
         // 2. Camera Movement Logic

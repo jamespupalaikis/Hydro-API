@@ -14,7 +14,6 @@
             --accent-color: #2dd4bf;   /* Teal/Cyan */
             --accent-hover: #14b8a6;   /* Darker Teal */
             --danger-color: #ef4444;   /* Red */
-            --input-border: #334155;
         }
 
         body {
@@ -29,47 +28,24 @@
             min-height: 100vh;
         }
 
-        /* Login Container in Header */
-        .auth-container {
-            display: flex;
-            gap: 10px;
-            align-items: center;
+        header {
+            margin-bottom: 30px;
+            text-align: center;
         }
 
-        .auth-input {
-            background-color: var(--panel-bg);
-            border: 1px solid var(--input-border);
-            color: var(--text-primary);
-            padding: 8px 12px;
-            border-radius: 6px;
-            outline: none;
-            transition: border-color 0.2s;
+        h1 {
+            margin: 0;
+            font-weight: 300;
+            letter-spacing: 2px;
+            color: var(--accent-color);
         }
 
-        .auth-input:focus {
-            border-color: var(--accent-color);
-        }
-
-        .user-display {
-            display: none; /* Hidden until logged in */
-            align-items: center;
-            gap: 15px;
-            color: var(--text-secondary);
-        }
-
-        /* DASHBOARD GRID (Hidden by default) */
         .dashboard-grid {
-            display: none; /* Hidden until logged in */
+            display: grid;
             grid-template-columns: 1fr;
             gap: 20px;
             width: 100%;
             max-width: 1000px;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         @media (min-width: 768px) {
@@ -78,7 +54,7 @@
             }
         }
 
-        /* CARD & ELEMENT STYLES */
+        /* Card Styling */
         .card {
             background-color: var(--panel-bg);
             border-radius: 12px;
@@ -95,6 +71,13 @@
             color: var(--text-secondary);
         }
 
+        /* Camera Feed Styling */
+        .camera-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
         .video-feed {
             width: 100%;
             height: auto;
@@ -106,6 +89,7 @@
             border: 2px solid #334155;
         }
 
+        /* Controls Styling */
         .controls-wrapper {
             display: flex;
             gap: 20px;
@@ -135,20 +119,52 @@
             justify-content: center;
         }
 
-        .btn:hover { background-color: var(--accent-color); color: var(--bg-color); }
-        .btn:active { transform: scale(0.95); }
+        .btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+        }
 
-        .btn-refresh { background-color: var(--accent-color); color: var(--bg-color); padding: 10px 20px; }
-        .btn-refresh:hover { background-color: var(--accent-hover); }
-        
-        .btn-logout { background-color: transparent; border: 1px solid var(--danger-color); color: var(--danger-color); }
-        .btn-logout:hover { background-color: var(--danger-color); color: white; }
+        .btn:active {
+            transform: scale(0.95);
+        }
 
-        /* Form Elements */
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; color: var(--text-secondary); font-size: 0.9rem; }
-        input[type="time"] { width: 100%; padding: 10px; background-color: var(--bg-color); border: 1px solid #475569; color: var(--text-primary); border-radius: 6px; box-sizing: border-box; }
-        
+        .btn-refresh {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            padding: 10px 20px;
+        }
+
+        .btn-refresh:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* Schedule Form Styling */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        input[type="time"] {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--bg-color);
+            border: 1px solid #475569;
+            color: var(--text-primary);
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        input[type="time"]:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
         .status-badge {
             display: inline-block;
             padding: 4px 8px;
@@ -164,34 +180,27 @@
         .btn-left { grid-column: 1; grid-row: 2; }
         .btn-right { grid-column: 3; grid-row: 2; }
         .btn-down { grid-column: 2; grid-row: 3; }
+
     </style>
 </head>
 <body>
 
     <header>
         <h1>HYDROPONICS<span style="color:white">LAB</span></h1>
-        
-        <div id="login-form" class="auth-container">
-            <input type="text" id="username" class="auth-input" placeholder="Username" required>
-            <input type="password" id="password" class="auth-input" placeholder="Password" required>
-            <button class="btn" onclick="login()">Sign In</button>
-        </div>
-
-        <div id="user-display" class="user-display">
-            <span id="welcome-msg">Welcome</span>
-            <button class="btn btn-logout" onclick="logout()">Logout</button>
-        </div>
     </header>
 
-    <div id="main-dashboard" class="dashboard-grid">
+    <div class="dashboard-grid">
         
         <div class="card">
             <div class="card-header">Live Feed</div>
-            <div style="display: flex; flex-direction: column; align-items: center;">
-                <img id="camera-stream" class="video-feed" src="" alt="Waiting for stream...">
+            <div class="camera-container">
+                <img id="camera-stream" class="video-feed" src="https://via.placeholder.com/640x360/0f172a/2dd4bf?text=Connecting+to+Camera..." alt="Live Stream">
                 
                 <div class="controls-wrapper">
-                    <button class="btn btn-refresh" onclick="refreshStream()">&#x21bb; Refresh Feed</button>
+                    <button class="btn btn-refresh" onclick="refreshStream()">
+                        &#x21bb; Refresh Feed
+                    </button>
+                    
                     <div class="d-pad">
                         <button class="btn btn-up" onclick="moveCamera('up')">&#x25B2;</button>
                         <button class="btn btn-left" onclick="moveCamera('left')">&#x25C0;</button>
@@ -204,147 +213,103 @@
 
         <div class="card">
             <div class="card-header">Light Schedule</div>
-            <div id="current-status" class="status-badge">System: Connected</div>
+            
+            <div id="current-status" class="status-badge">System: Checking...</div>
             
             <form id="schedule-form" style="margin-top: 20px;">
                 <div class="form-group">
                     <label for="start-time">Lights On</label>
-                    <input type="time" id="start-time">
+                    <input type="time" id="start-time" required>
                 </div>
+                
                 <div class="form-group">
                     <label for="end-time">Lights Off</label>
-                    <input type="time" id="end-time">
+                    <input type="time" id="end-time" required>
                 </div>
-                <button type="button" class="btn" style="width: 100%" onclick="updateSchedule()">Update Schedule</button>
+
+                <button type="button" class="btn" style="width: 100%" onclick="updateSchedule()">
+                    Update Schedule
+                </button>
             </form>
         </div>
 
     </div>
 
     <script>
-        const API_BASE_URL = "http://127.0.0.1:8000"//"http://192.168.0.14:8000"; 
-        let authToken = null; // Store session token here
-
-        // --- AUTHENTICATION LOGIC ---
-
-        async function login() {
-            const userIn = document.getElementById('username').value;
-            const passIn = document.getElementById('password').value;
-
-            if(!userIn || !passIn) { alert("Please enter credentials"); return; }
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/login?username=${userIn}&password=${passIn}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: userIn, password: passIn })
-                });
-
-                const data = await response.json();
-                // /*
-                if (response.ok) {
-                    // Success
-                    // authToken = data.token;
-                    document.getElementById('welcome-msg').textContent = `User: ${userIn}`;
-                    
-                    // Toggle UI
-                    document.getElementById('login-form').style.display = 'none';
-                    document.getElementById('user-display').style.display = 'flex';
-                    document.getElementById('main-dashboard').style.display = 'grid';
-                    
-                    // Initialize Dashboard Data
-                    refreshStream();
-                } else {
-                    alert("Login failed: " + data.detail);
-                } //*/
-            } catch (error) {
-                console.error("Login Error:", error);
-                alert("Could not connect to authentication server."); 
-            }
-                
+        // CONFIGURATION: Change this URL to match your FastAPI server address
+        const API_BASE_URL = "http://127.0.0.1:8000"; 
+        
+        // 1. Refresh Image Logic
+        function refreshStream() {
+            const imgElement = document.getElementById('camera-stream');
+            // We append a timestamp to the URL to prevent the browser from caching the image
+            //const timestamp = new Date().getTime();
+            // Assuming your FastAPI has an endpoint /video_feed
+            imgElement.src = `${API_BASE_URL}/api/take_pic`;
         }
 
-        function logout() {
-            authToken = null;
-            document.getElementById('login-form').style.display = 'flex';
-            document.getElementById('user-display').style.display = 'none';
-            document.getElementById('main-dashboard').style.display = 'none';
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-        }
-
-        // --- DASHBOARD LOGIC ---
-
-        function getHeaders() {
-            // Helper to attach token to requests
-            return {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
-            };
-        }
-
-        async function refreshStream() {
-            //if(!authToken) return;
-
-
-
-            try {
-                const img =  await fetch(`${API_BASE_URL}/api/take_pic`)//, {
-                //    method: 'GET',
-                //    headers: { 'Content-Type': 'application/json' },
-                //    body: JSON.stringify({ username: userIn, password: passIn })
-                //});
-                console.log("data")
-                const data = await img//.json();
-                console.log(data)
-                // /*
-                if (img.ok) {
-                    // Success
-                    const imgElement = document.getElementById('camera-stream');
-                    const timestamp = new Date().getTime();
-                    // In a real secure app, we might need to fetch the image as a Blob 
-                    // and create an object URL to pass headers. For this demo, 
-                    // we will just append the URL, assuming the image endpoint is public or cookie-based.
-                    imgElement.src = img;
-                    refreshStream();
-                } else {
-                    alert("Login failed: " + data.detail);
-                } //*/
-            } catch (error) {
-                console.error("CAmera Error:", error);
-                alert("Could not connect backend server."); 
-            }
-
-
-            
-            
-            
-        }
-
+        // 2. Camera Movement Logic
         async function moveCamera(direction) {
+            console.log(`Moving camera: ${direction}`);
             try {
-                await fetch(`${API_BASE_URL}/camera/move`, {
+                const response = await fetch(`${API_BASE_URL}/camera/move`, {
                     method: 'POST',
-                    headers: getHeaders(),
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                     body: JSON.stringify({ direction: direction }),
                 });
-            } catch (error) { console.error(error); }
+                
+                if (!response.ok) throw new Error('Failed to move camera');
+                console.log("Camera moved successfully");
+            } catch (error) {
+                console.error("Error moving camera:", error);
+                alert("Error connecting to camera controls.");
+            }
         }
 
+        // 3. Light Schedule Logic
         async function updateSchedule() {
-            const start = document.getElementById('start-time').value;
-            const end = document.getElementById('end-time').value;
+            const startTime = document.getElementById('start-time').value;
+            const endTime = document.getElementById('end-time').value;
+
+            if (!startTime || !endTime) {
+                alert("Please select both start and end times.");
+                return;
+            }
+
             try {
-                const res = await fetch(`${API_BASE_URL}/lights/schedule`, {
+                const response = await fetch(`${API_BASE_URL}/lights/schedule`, {
                     method: 'POST',
-                    headers: getHeaders(),
-                    body: JSON.stringify({ start, end }),
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ start: startTime, end: endTime }),
                 });
-                if(res.ok) {
+
+                if (response.ok) {
                     document.getElementById('current-status').textContent = "System: Schedule Updated";
+                    document.getElementById('current-status').style.backgroundColor = "rgba(45, 212, 191, 0.2)";
+                } else {
+                    throw new Error('Update failed');
                 }
-            } catch (error) { console.error(error); }
+            } catch (error) {
+                console.error("Error updating lights:", error);
+                alert("Failed to update schedule.");
+            }
         }
+
+        // Initial Load
+        window.onload = function() {
+            // Simulate fetching current schedule
+            // In production, you would fetch from `${API_BASE_URL}/lights/schedule`
+            document.getElementById('start-time').value = "08:00";
+            document.getElementById('end-time').value = "20:00";
+            document.getElementById('current-status').textContent = "System: Active";
+            
+            // Initial load of image
+            refreshStream(); 
+        };
     </script>
 </body>
 </html>

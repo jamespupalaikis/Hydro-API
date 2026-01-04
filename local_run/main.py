@@ -91,7 +91,7 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(login.router)
 #No mounting needed since we have a single frontend file? 
 
-security = HTTPBasic()
+security = 1#HTTPBasic()
 
 def verify_credentials(
     credentials: HTTPBasicCredentials,
@@ -143,9 +143,10 @@ print("middleware origins added")
 
 #Serve frontend
 @app.get("/")
-async def serve_react_app(credentials: HTTPBasicCredentials = Depends(security)):
+async def serve_react_app():#credentials: HTTPBasicCredentials = Depends(security)):
+    #verify_credentials(credentials)
     response = FileResponse("frontend/index.html")
-    response.set_cookie('basic_auth', f"Basic {encode_credentials(credentials.username, credentials.password)}", expires=None)
+    #response.set_cookie('basic_auth', f"Basic {encode_credentials(credentials.username, credentials.password)}", expires=None)
     return response
     
     
@@ -213,11 +214,11 @@ def encode_credentials(username: str, password: str) -> str:
  
 ##################################NEW PANTILT ENDPOINTS#################
 @app.get("/api/take_pic", tags=["camera"])
-async def take_pic( request:Request, name="test.jpg"):
+async def take_pic( request:Request, name="test.jpg"):#, credentials: HTTPBasicCredentials = Depends(security)):
     #login.verify_credentials(request)
 
     #cam.take_photo("pictures/"+name)
-
+    #verify_credentials(credentials)
     return FileResponse("pictures/"+name)
 
 #####################ORCHESTRATION LOOP##############################

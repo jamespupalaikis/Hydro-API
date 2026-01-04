@@ -295,7 +295,8 @@
                 //    body: JSON.stringify({ username: userIn, password: passIn })
                 //});
 
-                const data = await img.json();
+                const blob = await img.blob();
+                const objectURL = URL.createObjectURL(blob);
                 // /*
                 if (img .ok) {
                     // Success
