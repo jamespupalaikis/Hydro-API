@@ -16,9 +16,10 @@ router = APIRouter()
 def set_login_cookie(username, password, response:Response):
 
     response.set_cookie(key="creds", value=f"buffer{username}:::{password}")
-    
-    return "ok"
-    pass
+    res = verify_credentials()
+    return res
+    #return "ok"
+    #pass
 
 @router.get("/get-creds", tags=["login"])
 def get_credentials(request: Request):
@@ -26,7 +27,7 @@ def get_credentials(request: Request):
     return request.cookies.get("creds")
 
 
-@router.get("/verify-creds", tags=["login"])
+#@router.get("/verify-creds", tags=["login"])
 def verify_credentials(request:Request):
     
     Tcreds = ("admin", "jamesp123")

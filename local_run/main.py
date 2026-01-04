@@ -89,6 +89,42 @@ async def lifespan(app: FastAPI):
 #############################################Start FastAPI App##############################
 app = FastAPI(lifespan=lifespan)
 app.include_router(login.router)
+#No mounting needed since we have a single frontend file? 
+
+security = HTTPBasic()
+
+def verify_credentials(
+    credentials: HTTPBasicCredentials,
+):
+    
+    creds = ("admin", "jamesp123")
+    
+    c_un, c_pass = creds
+    
+    current_username_bytes = credentials.username.encode("utf8")
+    correct_username_string = c_un
+    correct_username_bytes = correct_username_string.encode("utf8")
+    is_correct_username = secrets.compare_digest(
+        current_username_bytes, correct_username_bytes
+    )
+    current_password_bytes = credentials.password.encode("utf8")
+    correct_password_string = c_pass
+    correct_password_bytes = correct_password_string.encode("utf8")
+    is_correct_password = secrets.compare_digest(
+        current_password_bytes, correct_password_bytes
+    )
+    if not (is_correct_username and is_correct_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return credentials.username
+
+def encode_credentials(username: str, password: str) -> str:
+    credentials = f"{username}:{password}"
+    encoded_credentials = base64.b64encode(credentials.encode()).decode("utf-8")
+    return encoded_credentials
 
 
 app.add_middleware(
@@ -106,9 +142,14 @@ print("middleware origins added")
 # serve the frontend at root
 
 #Serve frontend
-#@app.get("/")
-#async def serve_react_app():
-#    return FileResponse("UI/dist/index.html")
+@app.get("/")
+async def serve_react_app(credentials: HTTPBasicCredentials = Depends(security)):
+    response = FileResponse("frontend/index.html")
+    response.set_cookie('basic_auth', f"Basic {encode_credentials(credentials.username, credentials.password)}", expires=None)
+    return response
+    
+    
+
 
 
 # only handle specific static files that aren't in /assets
@@ -171,7 +212,13 @@ def encode_credentials(username: str, password: str) -> str:
 
  
 ##################################NEW PANTILT ENDPOINTS#################
+@app.get("/api/take_pic", tags=["camera"])
+async def take_pic( request:Request, name="test.jpg"):
+    #login.verify_credentials(request)
 
+    #cam.take_photo("pictures/"+name)
+
+    return FileResponse("pictures/"+name)
 
 #####################ORCHESTRATION LOOP##############################
 

@@ -294,10 +294,11 @@
                 //    headers: { 'Content-Type': 'application/json' },
                 //    body: JSON.stringify({ username: userIn, password: passIn })
                 //});
-
-                const data = await img.json();
+                console.log("data")
+                const data = await img//.json();
+                console.log(data)
                 // /*
-                if (img .ok) {
+                if (img.ok) {
                     // Success
                     const imgElement = document.getElementById('camera-stream');
                     const timestamp = new Date().getTime();
