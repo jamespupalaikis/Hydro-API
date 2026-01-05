@@ -31,6 +31,12 @@
         header {
             margin-bottom: 30px;
             text-align: center;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         h1 {
@@ -38,6 +44,12 @@
             font-weight: 300;
             letter-spacing: 2px;
             color: var(--accent-color);
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         .dashboard-grid {
@@ -69,6 +81,12 @@
             border-bottom: 1px solid #334155;
             padding-bottom: 10px;
             color: var(--text-secondary);
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         /* Camera Feed Styling */
@@ -141,6 +159,12 @@
         /* Schedule Form Styling */
         .form-group {
             margin-bottom: 15px;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         label {
@@ -173,6 +197,12 @@
             color: var(--accent-color);
             font-size: 0.8rem;
             margin-top: 10px;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         /* Grid positioning for D-Pad */
@@ -261,13 +291,30 @@
         // 2. Camera Movement Logic
         async function moveCamera(direction) {
             console.log(`Moving camera: ${direction}`);
+            let direction_api;
+            switch(direction){
+                case "up":
+                    direction_api = "tilt_up";
+                    break;
+                case "down":
+                    direction_api = "tilt_down";
+                    break;
+                case "left":
+                    direction_api = "pan_left";
+                    break;
+                case "right": 
+                    direction_api = "pan_right";
+                    break;
+            }
+
+
+
             try {
-                const response = await fetch(`${API_BASE_URL}/camera/move`, {
+                const response = await fetch(`${API_BASE_URL}/api/${direction_api}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ direction: direction }),
+                    }
                 });
                 
                 if (!response.ok) throw new Error('Failed to move camera');
@@ -276,6 +323,7 @@
                 console.error("Error moving camera:", error);
                 alert("Error connecting to camera controls.");
             }
+            refreshStream();
         }
 
         // 3. Light Schedule Logic
@@ -313,6 +361,8 @@
         window.onload = function() {
             // Simulate fetching current schedule
             // In production, you would fetch from `${API_BASE_URL}/lights/schedule`
+
+
             document.getElementById('start-time').value = "08:00";
             document.getElementById('end-time').value = "20:00";
             document.getElementById('current-status').textContent = "System: Active";
