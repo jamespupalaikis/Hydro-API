@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hydroponics Monitor</title>
+    <style>
+        :root {
+            /* Cool Color Scheme Palette */
+            --bg-color: #0f172a;       /* Dark Navy */
+            --panel-bg: #1e293b;       /* Slate */
+            --text-primary: #f1f5f9;   /* Off-white */
+            --text-secondary: #94a3b8; /* Light Gray */
+            --accent-color: #2dd4bf;   /* Teal/Cyan */
+            --accent-hover: #14b8a6;   /* Darker Teal */
+            --danger-color: #ef4444;   /* Red */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            margin-bottom: 30px;
+            text-align: center;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        h1 {
+            margin: 0;
+            font-weight: 300;
+            letter-spacing: 2px;
+            color: var(--accent-color);
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        @media (min-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+
+        /* Card Styling */
+        .card {
+            background-color: var(--panel-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
+        }
+
+        .card-header {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 10px;
+            color: var(--text-secondary);
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Camera Feed Styling */
+        .camera-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .video-feed {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16/9;
+            background-color: #000;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            object-fit: cover;
+            border: 2px solid #334155;
+        }
+
+        /* Controls Styling */
+        .controls-wrapper {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .d-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            width: 120px;
+        }
+
+        .btn {
+            background-color: #334155;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-refresh {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            padding: 10px 20px;
+        }
+
+        .btn-refresh:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* Schedule Form Styling */
+        .form-group {
+            margin-bottom: 15px;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        input[type="time"] {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--bg-color);
+            border: 1px solid #475569;
+            color: var(--text-primary);
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        input[type="time"]:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background-color: rgba(45, 212, 191, 0.1);
+            color: var(--accent-color);
+            font-size: 0.8rem;
+            margin-top: 10px;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* New Style for Current Schedule Display */
+        .current-schedule-box {
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        .current-time-display {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            font-weight: 300;
+            margin: 5px 0;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+
+        }
+
+        /* Grid positioning for D-Pad */
+        .btn-up { grid-column: 2; }
+        .btn-left { grid-column: 1; grid-row: 2; }
+        .btn-right { grid-column: 3; grid-row: 2; }
+        .btn-down { grid-column: 2; grid-row: 3; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1><span style="color:white">JAMES' </span>PLANT<span style="color:white">CLOSET</span></h1>
+    </header>
+
+    <div class="dashboard-grid">
+        
+        <div class="card">
+            <div class="card-header">Image Feed</div>
+            <div class="camera-container">
+                <img id="camera-stream" class="video-feed" src="https://via.placeholder.com/640x360/0f172a/2dd4bf?text=Connecting+to+Camera..." alt="Connecting to Camera...">
+                
+                <div class="controls-wrapper">
+                    <button class="btn btn-refresh" onclick="refreshStream()" disabled={loading}>
+                        &#x21bb; Refresh Feed
+                    </button>
+                    
+                    <div class="d-pad">
+                        <button class="btn btn-up" onclick="moveCamera('up')">&#x25B2;</button>
+                        <button class="btn btn-left" onclick="moveCamera('left')">&#x25C0;</button>
+                        <button class="btn btn-right" onclick="moveCamera('right')">&#x25B6;</button>
+                        <button class="btn btn-down" onclick="moveCamera('down')">&#x25BC;</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Light Schedule</div>
+            
+            <div class="current-schedule-box">
+                <label style="margin-bottom:0;">Currently Active Schedule</label>
+                <div class="current-time-display">
+                    <span id="display-start-time">--:--</span> &rarr; <span id="display-end-time">--:--</span>
+                </div>
+            </div>
+            
+            <div id="current-status" class="status-badge">System: Checking...</div>
+            
+            <form id="schedule-form" style="margin-top: 20px;">
+                <div class="form-group">
+                    <label for="start-time">Set Lights On</label>
+                    <input type="time" id="start-time" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="end-time">Set Lights Off</label>
+                    <input type="time" id="end-time" required>
+                </div>
+
+                <button type="button" class="btn" style="width: 100%" onclick="updateSchedule()">
+                    Update Schedule
+                </button>
+            </form>
+        </div>
+
+    </div>
+
+    <script>
+        // CONFIGURATION: Change this URL to match FastAPI server address
+        const API_BASE_URL = "http://192.168.0.14:8000"; 
+        let loading = false;
+
+        
+        // 1. Refresh Image Logic
+        async function refreshStream() {
+            loading = true;
+            const imgElement = document.getElementById('camera-stream');
+            
+            try {
+                const img =  await fetch(`${API_BASE_URL}/api/take_pic`);
+                const blob = await img.blob();
+                const objectURL = URL.createObjectURL(blob);
+                imgElement.src = objectURL
+            } catch (error) {
+                console.error("Error loading image", error);
+            }
+            loading = false;
+        }
+
+        // 2. Camera Movement Logic
+        async function moveCamera(direction) {
+            console.log(`Moving camera: ${direction}`);
+            let direction_api;
+            switch(direction){
+                case "up":
+                    direction_api = "tilt_up";
+                    break;
+                case "down":
+                    direction_api = "tilt_down";
+                    break;
+                case "left":
+                    direction_api = "pan_left";
+                    break;
+                case "right": 
+                    direction_api = "pan_right";
+                    break;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/${direction_api}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Failed to move camera');
+                console.log("Camera moved successfully");
+            } catch (error) {
+                console.error("Error moving camera:", error);
+                alert("Error connecting to camera controls.");
+            }
+            refreshStream();
+        }
+
+        // 3. Light Schedule Logic
+        
+        // New Function: Get Current Schedule
+        async function getSchedule() {
+            try {
+                // GET request to fetch current times
+                const response = await fetch(`${API_BASE_URL}/api/get_times`);
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Update the display text
+                    document.getElementById('display-start-time').innerText = `${data.start_time[0]}:${data.start_time[1]}`;
+                    document.getElementById('display-end-time').innerText = `${data.end_time[0]}:${data.end_time[1]}`;
+                    
+                    // Pre-fill the form inputs
+                    //document.getElementById('start-time').value = data.start;
+                    //document.getElementById('end-time').value = data.end;
+                    
+                    const system_status = await fetch(`${API_BASE_URL}/api/check_status`)
+                    console.log(system_status.text)
+                    if (system_status.ok) {
+                        const data2 = await system_status.json();
+                        if(data2.status[0] == "True"){
+                            document.getElementById('current-status').textContent = "System: Active";
+                        } else {
+                            document.getElementById('current-status').textContent = "System: Inactive";   
+                        }
+                    } else {
+                        document.getElementById('current-status').textContent = "System: Dink Error";
+
+                    }
+                } else {
+                    document.getElementById('current-status').textContent = "System: Sync Error";
+                }
+            } catch (error) {
+                console.error("Error fetching schedule:", error);
+                document.getElementById('current-status').textContent = "System: Offline";
+                document.getElementById('current-status').style.color = "var(--danger-color)";
+            }
+        }
+
+        async function updateSchedule() {
+            const startTime = document.getElementById('start-time').value;
+            const endTime = document.getElementById('end-time').value;
+            const start_hr = startTime.split(':')[0]
+            const end_hr = endTime.split(':')[0]
+            const start_min = startTime.split(':')[1]
+            const end_min = endTime.split(':')[1]
+            console.log(start_hr)
+            console.log(end_min)
+
+            if (!startTime || !endTime) {
+                alert("Please select both start and end times.");
+                return; 
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/UI_set_times`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 'start_hour': start_hr,
+                    'start_min': start_min,
+                    'end_hour': end_hr,
+                    'end_min': end_min
+                     }
+                 ),
+                });
+
+                if (response.ok) {
+                    document.getElementById('current-status').textContent = "System: Schedule Updated";
+                    document.getElementById('current-status').style.backgroundColor = "rgba(45, 212, 191, 0.2)";
+                } else {
+                    throw new Error('Update failed');
+                }
+            } catch (error) {
+                console.error("Error updating lights:", error);
+                alert("Failed to update schedule.");
+            }
+
+            getSchedule()
+        }
+
+        // Initial Load
+        window.onload = function() {
+            // Load the image
+            refreshStream(); 
+            
+            // Load the current schedule from API
+            document.getElementById('start-time').value = "08:00";
+            document.getElementById('end-time').value = "17:15";
+            //document.getElementById('current-status').textContent = "System: Active";
+            getSchedule();
+            
+        };
+    </script>
+</body>
+</html>
